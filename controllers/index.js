@@ -8,15 +8,16 @@ exports.splitPayment = (req, res, next) => {
 
     let SplitBreakdown = [];
     let ratioPosition = -1;
+    arrayLength = SplitInfo.length;
     Amount = parseInt(Amount);
 
-    if (SplitInfo.length < 1 || SplitInfo.length > 20) {
+    if (arrayLength < 1 || arrayLength > 20) {
         return next(
             new Error("The SplitInfo array can only contain 1-20 entities")
         );
     }
 
-    for (let i = 0; i < SplitInfo.length; i++) {
+    for (let i = 0; i < arrayLength; i++) {
         let splitType = SplitInfo[i].SplitType.toLowerCase();
         let splitValue = parseInt(SplitInfo[i].SplitValue);
 
@@ -61,7 +62,7 @@ exports.splitPayment = (req, res, next) => {
             0
         );
 
-        for (let i = ratioPosition; i < SplitInfo.length; i++) {
+        for (let i = ratioPosition; i < arrayLength; i++) {
             let x = (parseInt(SplitInfo[i].SplitValue) / ratioTotal) * Amount;
             SplitBreakdown.push({
                 SplitEntityId: SplitInfo[i]["SplitEntityId"],
