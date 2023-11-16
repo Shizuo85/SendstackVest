@@ -1,5 +1,4 @@
 exports.splitPayment = (req, res, next) => {
-    let start = Date.now()
     let { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
     SplitInfo = SplitInfo.sort((x, y) => {
         let a = x.SplitType.toUpperCase(),
@@ -73,9 +72,6 @@ exports.splitPayment = (req, res, next) => {
     }
 
     res.status(200).json({
-        time: Date.now() - start,
-        time1: Date.now(),
-        start,
         ID,
         Balance: Amount,
         SplitBreakdown,
