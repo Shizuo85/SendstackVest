@@ -1,14 +1,14 @@
 exports.splitPayment = (req, res, next) => {
     let { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
     SplitInfo = SplitInfo.sort((x, y) => {
-        let a = x.SplitType.toUpperCase(),
+        const a = x.SplitType.toUpperCase(),
             b = y.SplitType.toUpperCase();
         return a == b ? 0 : a > b ? 1 : -1;
     });
 
-    let SplitBreakdown = [];
+    const SplitBreakdown = [];
     let ratioPosition = -1;
-    arrayLength = SplitInfo.length;
+    const arrayLength = SplitInfo.length;
     Amount = parseInt(Amount);
 
     if (arrayLength < 1 || arrayLength > 20) {
@@ -18,8 +18,8 @@ exports.splitPayment = (req, res, next) => {
     }
 
     for (let i = 0; i < arrayLength; i++) {
-        let splitType = SplitInfo[i].SplitType.toLowerCase();
-        let splitValue = parseInt(SplitInfo[i].SplitValue);
+        const splitType = SplitInfo[i].SplitType.toLowerCase();
+        const splitValue = parseInt(SplitInfo[i].SplitValue);
 
         if (splitType == "flat") {
             Amount -= splitValue;
@@ -43,7 +43,7 @@ exports.splitPayment = (req, res, next) => {
                     )
                 );
             }
-            let x = (splitValue / 100) * Amount;
+            const x = (splitValue / 100) * Amount;
             SplitBreakdown.push({
                 SplitEntityId: SplitInfo[i]["SplitEntityId"],
                 Amount: x,
@@ -57,13 +57,13 @@ exports.splitPayment = (req, res, next) => {
     }
 
     if (ratioPosition != -1) {
-        let ratioTotal = SplitInfo.slice(ratioPosition).reduce(
+        const ratioTotal = SplitInfo.slice(ratioPosition).reduce(
             (total, split) => total + parseInt(split.SplitValue),
             0
         );
 
         for (let i = ratioPosition; i < arrayLength; i++) {
-            let x = (parseInt(SplitInfo[i].SplitValue) / ratioTotal) * Amount;
+            const x = (parseInt(SplitInfo[i].SplitValue) / ratioTotal) * Amount;
             SplitBreakdown.push({
                 SplitEntityId: SplitInfo[i]["SplitEntityId"],
                 Amount: x,
