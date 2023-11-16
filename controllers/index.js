@@ -1,10 +1,11 @@
 exports.splitPayment = (req, res, next) => {
+    let start = Date.now()
     let { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
-    SplitInfo = SplitInfo.sort((a, b) =>
-        a.SplitType.localeCompare(b.SplitType, undefined, {
-            sensitivity: "base",
-        })
-    );
+    SplitInfo = SplitInfo.sort((x, y) => {
+        let a = x.SplitType.toUpperCase(),
+            b = y.SplitType.toUpperCase();
+        return a == b ? 0 : a > b ? 1 : -1;
+    });
 
     let SplitBreakdown = [];
     let ratioPosition = -1;
@@ -12,9 +13,7 @@ exports.splitPayment = (req, res, next) => {
 
     if (SplitInfo.length < 1 || SplitInfo.length > 20) {
         return next(
-            new Error(
-                "The SplitInfo array can only contain 1-20 entities"
-            )
+            new Error("The SplitInfo array can only contain 1-20 entities")
         );
     }
 
@@ -74,8 +73,11 @@ exports.splitPayment = (req, res, next) => {
     }
 
     res.status(200).json({
+        time: Date.now() - start,
+        time1: Date.now(),
+        start,
         ID,
         Balance: Amount,
-        SplitBreakdown
+        SplitBreakdown,
     });
 };
