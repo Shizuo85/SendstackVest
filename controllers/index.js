@@ -7,7 +7,7 @@ exports.splitPayment = (req, res, next) => {
     });
 
     const SplitBreakdown = [];
-    let ratioPosition = -1;
+    let ratioTotal = 0;
     const arrayLength = SplitInfo.length;
     Amount = parseInt(Amount);
 
@@ -17,14 +17,14 @@ exports.splitPayment = (req, res, next) => {
         );
     }
 
-    for (let i = 0; i < arrayLength; i++) {
-        const splitType = SplitInfo[i].SplitType.toLowerCase();
-        const splitValue = parseInt(SplitInfo[i].SplitValue);
+    const ratioArray = SplitInfo.filter((SplitInfo) => {
+        const splitType = SplitInfo.SplitType.toLowerCase();
+        const splitValue = parseInt(SplitInfo.SplitValue);
 
         if (splitType == "flat") {
             Amount -= splitValue;
             SplitBreakdown.push({
-                SplitEntityId: SplitInfo[i]["SplitEntityId"],
+                SplitEntityId: SplitInfo["SplitEntityId"],
                 Amount: splitValue,
             });
 
@@ -45,33 +45,30 @@ exports.splitPayment = (req, res, next) => {
             }
             const x = (splitValue / 100) * Amount;
             SplitBreakdown.push({
-                SplitEntityId: SplitInfo[i]["SplitEntityId"],
+                SplitEntityId: SplitInfo["SplitEntityId"],
                 Amount: x,
             });
 
             Amount -= x;
         } else {
-            ratioPosition = i;
-            break;
+            ratioTotal += splitValue;
+            return true;
         }
-    }
-
-    if (ratioPosition != -1) {
-        const ratioTotal = SplitInfo.slice(ratioPosition).reduce(
-            (total, split) => total + parseInt(split.SplitValue),
-            0
-        );
-
-        for (let i = ratioPosition; i < arrayLength; i++) {
-            const x = (parseInt(SplitInfo[i].SplitValue) / ratioTotal) * Amount;
+        return false;
+    });
+    
+    if (ratioArray.length != 0) {
+        ratioArray.every((SplitInfo) => {
+            const x = (parseInt(SplitInfo.SplitValue) / ratioTotal) * Amount;
             SplitBreakdown.push({
-                SplitEntityId: SplitInfo[i]["SplitEntityId"],
+                SplitEntityId: SplitInfo["SplitEntityId"],
                 Amount: x,
             });
-        }
+            return true
+        });
         Amount = 0;
     }
-
+    
     res.status(200).json({
         ID,
         Balance: Amount,
