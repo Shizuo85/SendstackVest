@@ -29,18 +29,14 @@ exports.splitPayment = (req, res, next) => {
             });
 
             if (Amount < 0) {
-                return next(
-                    new Error(
-                        "Excessive Flat Split Value, final Balance cannot be less than 0"
-                    )
+                throw new Error(
+                    "Excessive Flat Split Value, final Balance cannot be less than 0"
                 );
             }
         } else if (splitType == "percentage") {
             if (splitValue > 100) {
-                return next(
-                    new Error(
-                        "Excessive percentage Split Value, final Balance cannot be less than 0"
-                    )
+                throw new Error(
+                    "Excessive percentage Split Value, final Balance cannot be less than 0"
                 );
             }
             const x = (splitValue / 100) * Amount;
@@ -56,7 +52,7 @@ exports.splitPayment = (req, res, next) => {
         }
         return false;
     });
-    
+
     if (ratioArray.length != 0) {
         ratioArray.every((SplitInfo) => {
             const x = (parseInt(SplitInfo.SplitValue) / ratioTotal) * Amount;
@@ -64,11 +60,11 @@ exports.splitPayment = (req, res, next) => {
                 SplitEntityId: SplitInfo["SplitEntityId"],
                 Amount: x,
             });
-            return true
+            return true;
         });
         Amount = 0;
     }
-    
+
     res.status(200).json({
         ID,
         Balance: Amount,

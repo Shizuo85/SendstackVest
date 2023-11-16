@@ -4,8 +4,8 @@ module.exports = (err, req, res, next) => {
             message: "Invalid ID",
         });
     }
-    res.status(err.statusCode || 500).json({
+    res.status(err.statusCode || 422).json({
         message: err.message || err,
-        errorField: err.inputField || false,
+        errorField: "SplitValue",
     });
 };
